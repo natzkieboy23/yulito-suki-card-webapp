@@ -70,7 +70,7 @@ export function TopSukis(props: {
           </div>
           {rest.length > 0 && (
             <div className="table-wrap">
-              <table>
+              <table className="suki-table">
                 <thead>
                   <tr>
                     <th>#</th>
@@ -85,8 +85,8 @@ export function TopSukis(props: {
                 <tbody>
                   {rest.map((r) => (
                     <tr key={r.member}>
-                      <td className="muted">{r.rank}</td>
-                      <td>
+                      <td className="muted c-rank">{r.rank}</td>
+                      <td className="c-suki">
                         <div className="suki-cell">
                           <span className="avatar avatar-sm">{initials(r.name)}</span>
                           <span>
@@ -97,15 +97,15 @@ export function TopSukis(props: {
                           </span>
                         </div>
                       </td>
-                      <td>{branchName(r.branch)}</td>
-                      <td>
+                      <td className="c-branch">{branchName(r.branch)}</td>
+                      <td className="c-tier">
                         <TierPill row={r} />
                       </td>
-                      <td className="num">
+                      <td className="num c-pts">
                         <strong>{fmtPts(r.points)}</strong>
                       </td>
-                      <td className="num">{fmtInt(r.visits)}</td>
-                      <td>
+                      <td className="num c-visits">{fmtInt(r.visits)}</td>
+                      <td className="c-prog">
                         {r.status.next && r.status.progressPct !== null ? (
                           <div className="progress">
                             <Bar pct={r.status.progressPct} className="bar-sm" />

@@ -222,6 +222,39 @@ th.num, td.num { text-align: right; }
   .kpis { grid-template-columns: 1fr; }
   .podium { grid-template-columns: 1fr; }
   .leaders { grid-template-columns: minmax(0, 1fr); }
+
   .heat { gap: 3px; grid-template-columns: 32px repeat(7, minmax(0, 1fr)); }
   .heat-col { font-size: 10px; }
+}
+
+/* Top sukis: table → stacked cards below 760px (no sideways scrolling) */
+@media (max-width: 760px) {
+  .table-wrap:has(.suki-table) { border: 0; border-radius: 0; overflow: visible; }
+  table.suki-table, .suki-table tbody { display: block; min-width: 0; }
+  .suki-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .suki-table tr {
+    display: grid;
+    grid-template-columns: 22px minmax(0, 1fr) auto;
+    grid-template-areas:
+      'rank suki   pts'
+      'rank branch tier'
+      'rank prog   visits';
+    gap: 6px 10px;
+    align-items: center;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 8px;
+  }
+  .suki-table td { padding: 0; border: 0; min-width: 0; }
+  .suki-table .c-rank { grid-area: rank; align-self: start; font-weight: 600; }
+  .suki-table .c-suki { grid-area: suki; }
+  .suki-table .c-pts { grid-area: pts; }
+  .suki-table .c-pts::after { content: ' pts'; color: var(--muted); font-size: 12px; }
+  .suki-table .c-branch { grid-area: branch; color: var(--muted); font-size: 12px; }
+  .suki-table .c-tier { grid-area: tier; justify-self: end; }
+  .suki-table .c-prog { grid-area: prog; }
+  .suki-table .c-visits { grid-area: visits; color: var(--muted); font-size: 12px; }
+  .suki-table .c-visits::after { content: ' visits'; }
+  .suki-table .suki-cell .avatar { display: none; }
 }
