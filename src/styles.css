@@ -185,6 +185,17 @@ th.num, td.num { text-align: right; }
 .leader-top-line { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
 .leader-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .leader-value { flex-shrink: 0; }
+.leader-chips { margin-bottom: 12px; }
+.branch-boards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+.leaders-single .leader-name { white-space: normal; overflow: visible; }
+.leaders-single .leader-top-line { align-items: flex-start; }
+.leaders-single .avatar { display: none; }
+.leaders-single .leader-name .muted, .branch-board-head .muted { white-space: nowrap; }
+.leaders-single .leader-rank { width: 18px; }
+.branch-board { border: 1px solid var(--border); border-radius: 12px; padding: 12px; min-width: 0; }
+.branch-board-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+.leaders-single { grid-template-columns: minmax(0, 1fr); gap: 0; }
+.leaders-single .leader:last-child { border-bottom: 0; }
 
 /* ---------- heatmap */
 .heat { display: grid; grid-template-columns: 40px repeat(7, minmax(0, 1fr)); gap: 5px; }

@@ -3,7 +3,7 @@ import { BranchRace } from './components/BranchRace';
 import { Header } from './components/Header';
 import { Heatmap } from './components/Heatmap';
 import { KpiRow } from './components/KpiRow';
-import { LEADER_TABS, Leaderboards } from './components/Leaderboards';
+import { EACH_BRANCH, EACH_BRANCH_LIMIT, LEADER_TABS, Leaderboards, type BranchBoard } from './components/Leaderboards';
 import { RefillRadar, Rewards, WinBack } from './components/SidePanels';
 import { TierLadder } from './components/TierLadder';
 import { TopSukis } from './components/TopSukis';
@@ -34,6 +34,7 @@ function Dashboard({ data, refreshing, refresh }: { data: DashboardData; refresh
   const [sukiFilter, setSukiFilter] = useState<Scope | null>(null); // null = follow dashboard scope
   const [leaderMetric, setLeaderMetric] = useState<LeaderMetric>('earned');
   const [leaderLimit, setLeaderLimit] = useState(10);
+  const [leaderFilter, setLeaderFilter] = useState<Scope | null>(null); // null = follow dashboard scope
 
   const now = toLocal(data.loadedAt, TZ_OFFSET_HOURS);
   const branchName = useCallback(
@@ -48,9 +49,22 @@ function Dashboard({ data, refreshing, refresh }: { data: DashboardData; refresh
   const tiers = useMemo(() => computeTiers(index, scope), [index, scope]);
   const sukiScope = sukiFilter ?? scope;
   const top = useMemo(() => computeTopSukis(data.txns, index, now, period, sukiScope), [data.txns, index, now, period, sukiScope]);
+  const leaderScope = leaderFilter ?? scope;
+  const eachBranch = leaderScope === EACH_BRANCH;
   const leaders = useMemo(
-    () => computeLeaderboard(data.txns, index, now, period, scope, leaderMetric, leaderLimit),
-    [data.txns, index, now, period, scope, leaderMetric, leaderLimit],
+    () => computeLeaderboard(data.txns, index, now, period, eachBranch ? ALL : leaderScope, leaderMetric, leaderLimit),
+    [data.txns, index, now, period, eachBranch, leaderScope, leaderMetric, leaderLimit],
+  );
+  const branchBoards = useMemo<BranchBoard[] | null>(
+    () =>
+      eachBranch
+        ? data.branches.map((b) => ({
+            code: b.code,
+            name: b.name,
+            ...computeLeaderboard(data.txns, index, now, period, b.code, leaderMetric, EACH_BRANCH_LIMIT),
+          }))
+        : null,
+    [eachBranch, data.branches, data.txns, index, now, period, leaderMetric],
   );
   const winBack = useMemo(() => computeWinBack(index, now, scope), [index, now, scope]);
   const heat = useMemo(() => computeHeatmap(data.txns, ranges.current, scope), [data.txns, ranges, scope]);
@@ -59,6 +73,7 @@ function Dashboard({ data, refreshing, refresh }: { data: DashboardData; refresh
   const focus = (code: string) => {
     setScope((s) => (s === code ? ALL : code));
     setSukiFilter(null);
+    setLeaderFilter(null);
   };
 
   const exportCsv = () => {
@@ -93,7 +108,7 @@ function Dashboard({ data, refreshing, refresh }: { data: DashboardData; refresh
       {
         title: `Leaderboard — ${LEADER_TABS.find((t) => t.key === leaderMetric)?.label ?? leaderMetric}`,
         header: ['Rank', 'Name', 'Card', 'Branch', 'Points earned', 'Points used', 'Redemptions', 'Visits', 'Spent (PHP)'],
-        rows: leaders.rows.map((r) => [
+        rows: (branchBoards ? branchBoards.flatMap((b) => b.rows) : leaders.rows).map((r) => [
           r.rank,
           r.name,
           maskCard(r.member),
@@ -154,9 +169,12 @@ function Dashboard({ data, refreshing, refresh }: { data: DashboardData; refresh
             onLimit={setLeaderLimit}
             rows={leaders.rows}
             total={leaders.total}
+            branches={data.branches}
             branchName={branchName}
+            filter={leaderScope}
+            onFilter={setLeaderFilter}
+            boards={branchBoards}
             periodWord={PERIOD_WORD[period]}
-            scopeName={scope === ALL ? null : branchName(scope)}
           />
         </div>
         <div className="col-main">

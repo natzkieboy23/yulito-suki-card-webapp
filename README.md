@@ -11,7 +11,7 @@ Built with React 19, Vite and TypeScript. The design follows `Suki Points — al
 - **Branch race**: branches ranked by points earned. Click a branch to focus the whole dashboard on it.
 - **Tier ladder**: Platinum, Gold, Silver and Regular, based on calendar-year points.
 - **Top sukis**: top 10 earners with visits, weekly visit streak and progress to the next tier. Filter by branch.
-- **Leaderboards**: sukis ranked highest to lowest by points earned, points used (redeemed), number of visits, or pesos spent. Shows each suki's name, masked card and branch, with Top 10 / 25 / 50.
+- **Leaderboards**: sukis ranked highest to lowest by points earned, points used (redeemed), number of visits, or pesos spent. Shows each suki's name, masked card and branch, with Top 10 / 25 / 50. Filter to one branch, or pick **Each branch** to see the top 5 at every branch side by side.
 - **Win-back list**: high-value sukis with no visit in 45+ days.
 - **When sukis earn**: heatmap of points by weekday and 2-hour slot, naming the busiest and quietest slots.
 - **CSV export** of the current view. Auto-refresh every 5 minutes.
