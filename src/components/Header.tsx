@@ -35,7 +35,14 @@ export function Header(props: {
           </div>
         </div>
         <div className="controls">
-          <div className="segmented" role="tablist" aria-label="Period">
+          <div
+            className="segmented"
+            role="tablist"
+            aria-label="Period"
+            style={{ ['--i' as string]: Math.max(0, PERIODS.findIndex((p) => p.key === props.period)) }}
+          >
+            {/* one pill that slides under the active option */}
+            <span className="seg-indicator" aria-hidden />
             {PERIODS.map((p) => (
               <button
                 key={p.key}
@@ -59,11 +66,11 @@ export function Header(props: {
       <div className="scope-row small">
         {props.scopeName ? (
           <button className="chip chip-active" onClick={props.onClearScope} title="Show all branches">
-            <span className="dot" /> {props.scopeName} ✕
+            <span className="dot" key={props.loadedAt ?? 0} /> {props.scopeName} ✕
           </button>
         ) : (
           <span className="chip">
-            <span className="dot" /> All {props.branchCount} branches
+            <span className="dot" key={props.loadedAt ?? 0} /> All {props.branchCount} branches
           </span>
         )}
         <span className="muted">{props.periodLabel}</span>

@@ -1,4 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
+import { flushSync } from 'react-dom';
+import { DashboardSkeleton } from './components/Skeleton';
 import { BranchRace } from './components/BranchRace';
 import { Header } from './components/Header';
 import { Heatmap } from './components/Heatmap';
@@ -70,11 +72,12 @@ function Dashboard({ data, refreshing, refresh }: { data: DashboardData; refresh
   const heat = useMemo(() => computeHeatmap(data.txns, ranges.current, scope), [data.txns, ranges, scope]);
   const redemptions = useMemo(() => computeRedemptions(data.txns, ranges.current, scope), [data.txns, ranges, scope]);
 
-  const focus = (code: string) => {
-    setScope((s) => (s === code ? ALL : code));
-    setSukiFilter(null);
-    setLeaderFilter(null);
-  };
+  const focus = (code: string) =>
+    withViewTransition(() => {
+      setScope((s) => (s === code ? ALL : code));
+      setSukiFilter(null);
+      setLeaderFilter(null);
+    });
 
   const exportCsv = () => {
     const csv = toCsv([
@@ -214,12 +217,18 @@ export default function App() {
       </div>
     );
   }
-  return (
-    <div className="center">
-      <div className="card state">
-        <div className="spinner" aria-hidden />
-        <p className="muted small">Loading suki transactions…</p>
-      </div>
-    </div>
-  );
+  return <DashboardSkeleton />;
+}
+
+/**
+ * Crossfade the whole dashboard when the branch focus changes (View Transitions API).
+ * Browsers without it, or users who prefer reduced motion, get the instant update.
+ */
+function withViewTransition(update: () => void) {
+  const doc = document as unknown as { startViewTransition?: (cb: () => void) => unknown };
+  if (!doc.startViewTransition || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    update();
+    return;
+  }
+  doc.startViewTransition(() => flushSync(update));
 }

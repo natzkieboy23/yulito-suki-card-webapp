@@ -1,11 +1,19 @@
 import { HEALTHY_REDEMPTION, POINT_VALUE_PESOS } from '../config';
 import type { Kpis } from '../data/metrics';
 import { fmtDelta, fmtInt, fmtPct, fmtPeso, fmtPts } from '../lib/format';
-import { Badge, Sparkline, type Tone } from './ui';
+import { AnimatedNumber, Badge, Sparkline, type Tone } from './ui';
 
 const deltaTone = (d: number | null): Tone => (d === null ? 'neutral' : d >= 0 ? 'up' : 'down');
 
-function Kpi(props: { label: string; value: string; badge: string; tone: Tone; sub: string; spark: number[] }) {
+function Kpi(props: {
+  label: string;
+  value: number;
+  format: (n: number) => string;
+  badge: string;
+  tone: Tone;
+  sub: string;
+  spark: number[];
+}) {
   return (
     <div className="card kpi">
       <div className="kpi-head">
@@ -13,7 +21,9 @@ function Kpi(props: { label: string; value: string; badge: string; tone: Tone; s
         <Badge tone={props.tone}>{props.badge}</Badge>
       </div>
       <div className="kpi-body">
-        <span className="kpi-value">{props.value}</span>
+        <span className="kpi-value">
+          <AnimatedNumber value={props.value} format={props.format} />
+        </span>
         <Sparkline values={props.spark} />
       </div>
       <p className="muted small">{props.sub}</p>
@@ -30,7 +40,8 @@ export function KpiRow({ k }: { k: Kpis }) {
     <div className="kpis">
       <Kpi
         label="Points issued"
-        value={fmtPts(k.issued.value)}
+        value={k.issued.value}
+        format={fmtPts}
         badge={fmtDelta(k.issued.deltaPct)}
         tone={deltaTone(k.issued.deltaPct)}
         sub={`${fmtPeso(k.issued.value * POINT_VALUE_PESOS)} in rewards value earned`}
@@ -38,7 +49,8 @@ export function KpiRow({ k }: { k: Kpis }) {
       />
       <Kpi
         label="Points redeemed"
-        value={fmtPts(k.redeemed.value)}
+        value={k.redeemed.value}
+        format={fmtPts}
         badge={rate === null ? '— rate' : `${fmtPct(rate)} rate`}
         tone={rate === null ? 'neutral' : healthy ? 'up' : 'warn'}
         sub={`Healthy range is ${HEALTHY_REDEMPTION.min}–${HEALTHY_REDEMPTION.max}% of points issued`}
@@ -46,7 +58,8 @@ export function KpiRow({ k }: { k: Kpis }) {
       />
       <Kpi
         label="Active sukis"
-        value={fmtInt(k.active.value)}
+        value={k.active.value}
+        format={fmtInt}
         badge={fmtDelta(k.active.deltaPct)}
         tone={deltaTone(k.active.deltaPct)}
         sub="Members with at least one purchase this period"
@@ -54,7 +67,8 @@ export function KpiRow({ k }: { k: Kpis }) {
       />
       <Kpi
         label="Unredeemed balance"
-        value={fmtPeso(k.balance.value * POINT_VALUE_PESOS)}
+        value={k.balance.value * POINT_VALUE_PESOS}
+        format={fmtPeso}
         badge="Watch"
         tone="warn"
         sub={`Points owed to sukis at ${fmtPeso(POINT_VALUE_PESOS)} per point`}
